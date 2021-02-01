@@ -1,0 +1,84 @@
+7. redis 事务：
+命令：multi(表示进入事务),exec（表示执行事务中队列中所有命令），WATCH（在事务中监控一个键值，当键值被改变会主动通知），discard(清楚所有队列中的命令)
+在执行事务前使用watch来监控一个变量，如果事务的执行过程中，被监控的变量改变了，则事务执行失败，回滚
+
+1.redis事务特性: 1.不保证原子性,中间的命令失败不影响其他命令
+
+redis执行lua 脚本 eval "return redis.call('set','foo','bar')" 0
+可以用来执行多个命令,并且是原子的
+
+
+redis内部实现:
+1.存内存访问
+2.异步IO多路复用，使用EPOLL
+3.单线程避免线程切换
+
+在redis的key,value结构写入一个200M的数据，一个客户端去读。会造成什么现象，会阻塞，因为redis是单线程
+
+redis
+1.支持持久化
+2.主从同步
+数据类型有:
+key-value, hashmap, list,set,sortset
+zsort是根据分数来排序的集合,函数是zadd( list1, 5, data ), 5就是分数。排序根据分数来排序, 而set根据键值来排序
+使用setnx(key来加锁)，如果成功则表示没有被锁住，
+
+
+1.ZOOKEEPER
+1.数据订阅和发布，既配置中心，实现配置的集中管理和配置更新，服务可以主动推送变更配置到客户端
+2.命名服务，在RPC框架中可以根据服务的名字获取到IP地址
+3.分布式协调,在分布式环境下当机器节点发生变更的时候对客户端watch通知
+4.master选举
+5.分布式锁
+6.使用ZAB协议类似PAXOS协议
+
+
+ETCD
+etcd是一个基于HTTP+json的键值分布式存储系统，key-value
+使用了一致性协议,RAFT协议节点宕机可以重新选举
+ETCD支持HTTPS，保密协议，存储速度更快，持久化更快
+etcd可以实现服务发现，服务器启动的时候向etcd注册自己，客户端通过访问etcd得到服务器列表，可以把负载均衡策略放到客户端使用grpcpolicy库在客户端实现负载均衡
+如果要nginx和etcd结合达到动态负载均衡，使用nginx+etcd+confd来动态更新nginx配置文件
+
+
+消息中间件:
+常见MQ有：
+1.activeMQ
+2.rabbitMQ
+3.kaffka 日志消息中间件
+消息中间件的好处:
+各个系统之间的解耦，例如登录系统登录之后需要调用短信系统和日志系统，只需要将消息入队列即可
+有消息回复机制的中间件有确保消息不可丢失的功能
+具有削峰的功能
+
+ngnix实现长连接
+0.nginx实现反向代理的时候如何实现长连接
+1.http的括号里加入 keepalive_timeout  65;,这里是让客户端到nginx的长连接有效
+2.同时要求客户端的协议里也支持keepalive
+3.这里的长连接包括客户端到nginx的和nginx到后端server的
+4.让nginx对后端服务的反向代理也支持长连接要在
+
+http {
+	upstream backend {
+		server 192.168.0.1：8080 weight=1 max_fails=2 fail_timeout=30s;
+		server 192.168.0.2：8080 weight=1 max_fails=2 fail_timeout=30s;
+		keepalive 300; // 这个很重要！
+	}   
+	server {
+		listen 8080 default_server;
+		server_name "";
+		location / {
+		proxy_pass http://backend;
+		proxy_http_version 1.1;                         # 设置http版本为1.1
+		proxy_set_header Connection "";                 # 设置Connection为长连接（默认为no）}
+	}
+}
+}
+
+nginx 的架构
+nginx分为master和worker的架构
+master作用是分配和调度,决定启用多少个work进程,和work进程的调度,并不直接参与数据网络数据的收发
+worker进程负责网络数据的收发，处理http请求，后面fasgcgi的调用，反响代理功能，正则表达式解析,使用了epoll异步模型,
+
+
+
