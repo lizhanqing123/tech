@@ -2,7 +2,7 @@
 
 2.go官网下载go最新版本, linux amd64版本
 
-3.设置GOROOT和GOPATH,GOROOT是go的默认安装目录。一般在/usr/local下面,解压下载的go包,那么GOROOT就是/usr/local/go,
+3.设置GOROOT和GOPATH,GOROOT是go的默认安装目录。一般在/usr/local下面,解压下载的go包,那么GOROOT就是/usr/local/go,如果是升级go。需要把之前得/usr/local/go删除掉
 export GOROOT=/usr/local/go
 export PATH=$PATH:$GOROOT/bin
 export GOPATH=/root/go
