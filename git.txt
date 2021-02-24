@@ -87,6 +87,15 @@ git merge dev
 抽取代码
 git archive --format tar.gz --output "./c++1.0.tar.gz" master
 
+git pull失败时隐藏本地修改
+git stash
+
+pull后恢复本地修改
+git stash apply
+
+因为有冲突导致git pull失败。删了也恢复不了
+git reset --hard FETCH_HEAD
+
 
 
 
